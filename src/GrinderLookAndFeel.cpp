@@ -84,7 +84,7 @@ void GrinderLookAndFeel::drawRotarySlider (juce::Graphics& g, int x, int y, int 
         const auto direction = juce::Point<float> (std::sin (angle), -std::cos (angle));
         const auto pointerLine = juce::Line<float> (
             centre + direction * (radius * 0.24f), centre + direction * pointerLength);
-        g.setColour (accent);
+        g.setColour (knobAccent);
         g.drawLine (pointerLine, radius * 0.10f);
     }
 
