@@ -13,9 +13,9 @@ public:
                            float sliderPos, float rotaryStartAngle, float rotaryEndAngle,
                            juce::Slider&) override;
 
-    void drawToggleButton (juce::Graphics&, bool shouldDrawButtonAsHighlighted,
-                           bool isButtonDown, bool isOver,
-                           juce::ToggleButton&) override;
+    void drawToggleButton (juce::Graphics&, juce::ToggleButton&,
+                           bool shouldDrawButtonAsHighlighted,
+                           bool shouldDrawButtonAsDown) override;
 
     // Current character accent (set by the editor).
     juce::Colour accent { 0xffe07b39 };

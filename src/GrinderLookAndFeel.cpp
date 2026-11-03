@@ -94,9 +94,9 @@ void GrinderLookAndFeel::drawRotarySlider (juce::Graphics& g, int x, int y, int 
 }
 
 void GrinderLookAndFeel::drawToggleButton (juce::Graphics& g,
+                                           juce::ToggleButton& button,
                                            bool shouldDrawButtonAsHighlighted,
-                                           bool isButtonDown, bool /*isOver*/,
-                                           juce::ToggleButton& button)
+                                           bool shouldDrawButtonAsDown)
 {
     auto bounds = button.getLocalBounds().toFloat().reduced (2.0f);
     const auto isOn = button.getToggleState();
@@ -136,7 +136,7 @@ void GrinderLookAndFeel::drawToggleButton (juce::Graphics& g,
     g.setGradientFill (lever);
     g.fillRoundedRectangle (leverRect, 3.0f);
 
-    if (shouldDrawButtonAsHighlighted || isButtonDown)
+    if (shouldDrawButtonAsHighlighted || shouldDrawButtonAsDown)
     {
         g.setColour (juce::Colours::white.withAlpha (0.08f));
         g.fillRoundedRectangle (bounds.expanded (1.0f), 4.0f);
