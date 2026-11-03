@@ -132,7 +132,8 @@ void GrinderAudioProcessorEditor::drawScrew (juce::Graphics& g, juce::Point<floa
                                              float radius) const
 {
     juce::ColourGradient grad (juce::Colour (0xffb9b3a6), centre.x - radius, centre.y - radius,
-                               juce::Colour (0xff6b665e), centre.x + radius, centre.y + radius);
+                               juce::Colour (0xff6b665e), centre.x + radius, centre.y + radius,
+                               false);
     g.setGradientFill (grad);
     g.fillEllipse (juce::Rectangle<float> (radius * 2.0f, radius * 2.0f).withCentre (centre));
     g.setColour (juce::Colour (0xff3c382f));
@@ -149,7 +150,7 @@ void GrinderAudioProcessorEditor::drawReel (juce::Graphics& g, juce::Point<float
     juce::ColourGradient grad (juce::Colour (0xff4c4c55), centre.x - radius,
                                 centre.y - radius,
                                 juce::Colour (0xff21212a), centre.x + radius,
-                                centre.y + radius);
+                                centre.y + radius, false);
     g.setGradientFill (grad);
     g.fillEllipse (juce::Rectangle<float> (radius * 2.0f, radius * 2.0f).withCentre (centre));
 
@@ -185,20 +186,21 @@ void GrinderAudioProcessorEditor::drawKnobLabel (juce::Graphics& g, const juce::
 
 void GrinderAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    const auto bounds = getLocalBounds().toFloat();
+    auto bounds = getLocalBounds().toFloat();
 
     // Warm cream faceplate with a subtle vertical sheen.
     juce::ColourGradient plate (juce::Colour (0xfff1e9d6), bounds.getCentreX(), bounds.getY(),
                                juce::Colour (0xffddd0b4), bounds.getCentreX(),
-                               bounds.getBottom());
+                               bounds.getBottom(), false);
     plate.addColour (0.6f, juce::Colour (0xffe7dcc4));
     g.setGradientFill (plate);
     g.fillAll();
 
     // Dark tape-machine head strip at the top.
-    auto headStrip = bounds.removeFromTop (86.0f);
+    const auto headStrip = juce::Rectangle<float> (bounds.getX(), bounds.getY(),
+                                                    bounds.getWidth(), 86.0f);
     juce::ColourGradient strip (juce::Colour (0xff37373f), headStrip.getTopLeft(),
-                                juce::Colour (0xff1d1d24), headStrip.getBottomLeft());
+                                juce::Colour (0xff1d1d24), headStrip.getBottomLeft(), false);
     g.setGradientFill (strip);
     g.fillRect (headStrip);
 

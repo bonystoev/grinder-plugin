@@ -46,7 +46,7 @@ void VUMeter::paint (juce::Graphics& g)
     juce::ColourGradient back (juce::Colour (0xfff6ecd4), bounds.getCentreX(),
                                bounds.getY(),
                                juce::Colour (0xffdcc99c), bounds.getCentreX(),
-                               bounds.getBottom());
+                               bounds.getBottom(), false);
     g.setGradientFill (back);
     g.fillRoundedRectangle (bounds, 6.0f);
 
@@ -260,7 +260,7 @@ void CharacterSwitch::paint (juce::Graphics& g)
         juce::ColourGradient body (juce::Colour (0xffd9d3c6), centre.x - radius,
                                     centre.y - radius,
                                     juce::Colour (0xff77726a), centre.x + radius * 0.5f,
-                                    centre.y + radius);
+                                    centre.y + radius, false);
         body.addColour (0.5f, juce::Colour (0xffaca69a));
         g.setGradientFill (body);
         g.fillEllipse (juce::Rectangle<float> (radius * 2.0f, radius * 2.0f).withCentre (centre));

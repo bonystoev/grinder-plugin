@@ -50,7 +50,7 @@ void GrinderLookAndFeel::drawRotarySlider (juce::Graphics& g, int x, int y, int 
         juce::ColourGradient bezel (juce::Colour (0xffcfc9bd), centre.x - radius,
                                     centre.y - radius,
                                     juce::Colour (0xff6e6a62), centre.x + radius * 0.4f,
-                                    centre.y + radius);
+                                    centre.y + radius, false);
         bezel.addColour (0.55f, juce::Colour (0xffa9a49a));
         g.setGradientFill (bezel);
         g.fillEllipse (juce::Rectangle<float> (radius * 2.2f, radius * 2.2f)
@@ -64,7 +64,7 @@ void GrinderLookAndFeel::drawRotarySlider (juce::Graphics& g, int x, int y, int 
         juce::ColourGradient grad (juce::Colour (0xff5c4232).brighter (0.25f),
                                    centre.x, centre.y - radius,
                                    juce::Colour (0xff2e211a), centre.x,
-                                   centre.y + radius);
+                                   centre.y + radius, false);
         grad.addColour (0.5f, juce::Colour (0xff463227));
         g.setGradientFill (grad);
         g.fillEllipse (body);
@@ -103,7 +103,7 @@ void GrinderLookAndFeel::drawToggleButton (juce::Graphics& g,
 
     // Toggle plate: dark metal with two positions.
     juce::ColourGradient plate (juce::Colour (0xff3a3a40), bounds.getTopLeft(),
-                                 juce::Colour (0xff232327), bounds.getBottomRight());
+                                 juce::Colour (0xff232327), bounds.getBottomRight(), false);
     g.setGradientFill (plate);
     g.fillRoundedRectangle (bounds, bounds.getWidth() * 0.25f);
     g.setColour (juce::Colour (0xff15151a));
@@ -132,7 +132,7 @@ void GrinderLookAndFeel::drawToggleButton (juce::Graphics& g,
                                                    leverTrack.getWidth(), leverH)
                                .reduced (1.5f);
     juce::ColourGradient lever (juce::Colour (0xffe6e0d2), leverRect.getTopLeft(),
-                                juce::Colour (0xff8f887c), leverRect.getBottomRight());
+                                juce::Colour (0xff8f887c), leverRect.getBottomRight(), false);
     g.setGradientFill (lever);
     g.fillRoundedRectangle (leverRect, 3.0f);
 
