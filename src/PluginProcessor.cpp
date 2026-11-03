@@ -29,8 +29,6 @@ GrinderAudioProcessor::createParameterLayout()
     layout.add (std::make_unique<juce::AudioParameterFloat> (
         juce::ParameterID { "drive", 1 }, "Drive", 0.0f, 100.0f, 35.0f));
 
-    juce::AudioParameterChoice::Attributes charAttrs;
-    charAttrs.withAutomatable (true);
     layout.add (std::make_unique<juce::AudioParameterChoice> (
         juce::ParameterID { "character", 1 }, "Character",
         juce::StringArray { "Tube", "Diode", "Fuzz", "Tape", "Cassette", "Dictaphone" }, 0));

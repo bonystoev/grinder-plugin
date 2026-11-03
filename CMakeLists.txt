@@ -14,12 +14,19 @@ juce_add_plugin(Grinder
     COMPANY_NAME "Grinder Audio"
     PLUGIN_MANUFACTURER_CODE Gnda
     PLUGIN_CODE Grnd
-    FORMATS VST3 AU CLAP Standalone
+    FORMATS VST3 AU Standalone
     PRODUCT_NAME "Grinder"
+    BUNDLE_ID "com.bonystoev.Grinder"
     IS_SYNTH FALSE
     NEEDS_MIDI_INPUT FALSE
     NEEDS_MIDI_OUTPUT FALSE
     COPY_PLUGIN_AFTER_BUILD FALSE
+)
+
+clap_juce_extensions_plugin(
+    TARGET Grinder
+    CLAP_ID "com.bonystoev.Grinder"
+    CLAP_FEATURES audio-effect distortion
 )
 
 target_sources(Grinder PRIVATE
@@ -39,8 +46,9 @@ target_compile_definitions(Grinder PUBLIC
 
 target_link_libraries(Grinder PRIVATE
     juce::juce_audio_utils
+    juce::juce_audio_plugin_client
     juce::juce_dsp
-    clap_juce_extensions::clap_juce_extensions
+    clap_juce_extensions
 )
 
 if(GRINDER_BUILD_TESTS)
