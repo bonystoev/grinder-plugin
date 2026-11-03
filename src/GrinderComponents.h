@@ -3,11 +3,12 @@
 #include "PluginProcessor.h"
 #include "GrinderLookAndFeel.h"
 
-// Animated VU meter with real ballistics (300 ms rise / 1.5 s fall).
+// Animated level meter with real ballistics, dBFS scale.
+// `sourceSwitch` toggles between input (on) and output (off) level.
 class VUMeter : public juce::Component, private juce::Timer
 {
 public:
-    explicit VUMeter (GrinderAudioProcessor&);
+    VUMeter (GrinderAudioProcessor&, const juce::ToggleButton& sourceSwitch);
     ~VUMeter() override;
 
     void paint (juce::Graphics&) override;
@@ -17,7 +18,8 @@ private:
     static float vuAngleFor (float db);
 
     GrinderAudioProcessor& processor;
-    float needlePos = 0.0f;   // 0..1 across the VU arc
+    const juce::ToggleButton& sourceSwitch;
+    float needlePos = 0.0f;   // 0..1 across the meter arc
     float smoothedDb = -60.0f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VUMeter)

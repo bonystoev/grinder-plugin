@@ -109,7 +109,15 @@ void GrinderLookAndFeel::drawToggleButton (juce::Graphics& g,
     g.setColour (juce::Colour (0xff15151a));
     g.drawRoundedRectangle (bounds, bounds.getWidth() * 0.25f, 1.0f);
 
-    // Labels ON / OFF.
+    // Labels: ON/OFF by default, overridable via the "onLabel"/"offLabel"
+    // button properties (e.g. IN/OUT for the meter source switch).
+    const auto* onLabelVar = button.getProperties().getVarPointer ("onLabel");
+    const auto* offLabelVar = button.getProperties().getVarPointer ("offLabel");
+    const auto onLabel = onLabelVar != nullptr && onLabelVar->isString()
+                             ? onLabelVar->toString() : juce::String ("ON");
+    const auto offLabel = offLabelVar != nullptr && offLabelVar->isString()
+                              ? offLabelVar->toString() : juce::String ("OFF");
+
     g.setFont (juce::Font (juce::FontOptions{}.withHeight (bounds.getHeight() * 0.22f)
                                                  .withStyle ("Bold")));
     const auto onColour = isOn ? juce::Colour (0xffd8d2c2)
@@ -117,10 +125,10 @@ void GrinderLookAndFeel::drawToggleButton (juce::Graphics& g,
     const auto offColour = isOn ? juce::Colour (0xff6a6a70)
                                 : juce::Colour (0xffd8d2c2);
     g.setColour (onColour);
-    g.drawText ("ON", bounds.removeFromTop (bounds.getHeight() * 0.35f),
+    g.drawText (onLabel, bounds.removeFromTop (bounds.getHeight() * 0.35f),
                 juce::Justification::centred);
     g.setColour (offColour);
-    g.drawText ("OFF", bounds, juce::Justification::centred);
+    g.drawText (offLabel, bounds, juce::Justification::centred);
 
     // Lever: knob that slides between the two labels.
     const auto leverTrack = button.getLocalBounds().toFloat().reduced (

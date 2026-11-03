@@ -20,10 +20,16 @@ GrinderAudioProcessorEditor::GrinderAudioProcessorEditor (GrinderAudioProcessor&
     : AudioProcessorEditor (p),
       processor (p),
       characterSwitch (p),
-      vuMeter (p),
+      vuMeter (p, vuSourceButton),
       ledChain (p)
 {
     setLookAndFeel (&look);
+
+    vuSourceButton.setClickingTogglesState (true);
+    vuSourceButton.getProperties().set ("onLabel", "IN");
+    vuSourceButton.getProperties().set ("offLabel", "OUT");
+    vuSourceButton.setLookAndFeel (&look);
+    addAndMakeVisible (vuSourceButton);
 
     // ---- Big knobs -------------------------------------------------------
     configureKnob (driveSlider);
@@ -90,6 +96,8 @@ GrinderAudioProcessorEditor::GrinderAudioProcessorEditor (GrinderAudioProcessor&
     addAndMakeVisible (vuMeter);
     addAndMakeVisible (ledChain);
 
+    vuSourceButton.setBounds (juce::Rectangle<int> (594, 108, 32, 60));
+
     setSize (panelWidth, panelHeight);
     setResizable (false, false);
     startTimerHz (30);
@@ -99,6 +107,7 @@ GrinderAudioProcessorEditor::~GrinderAudioProcessorEditor()
 {
     stopTimer();
     tiltWetOnlyButton.setLookAndFeel (nullptr);
+    vuSourceButton.setLookAndFeel (nullptr);
     for (auto* knob : std::initializer_list<juce::Slider*> {
              &driveSlider, &mixSlider, &outputSlider,
              &tiltSlider, &midCharacterSlider, &lowCutSlider, &presenceSlider,
@@ -251,6 +260,8 @@ void GrinderAudioProcessorEditor::paint (juce::Graphics& g)
     drawKnobLabel (g, wowFlutterSlider, "WOW/FLUTTER");
     drawKnobLabel (g, noiseSlider, "NOISE");
 
+    drawKnobLabel (g, vuSourceButton, "METER");
+
     // Toggle switch label.
     {
         auto tb = tiltWetOnlyButton.getBoundsInParent().toFloat();
@@ -265,8 +276,9 @@ void GrinderAudioProcessorEditor::paint (juce::Graphics& g)
 
 void GrinderAudioProcessorEditor::resized()
 {
-    // VU window top-centre (below head strip).
+    // VU window top-centre (below head strip) and its source switch.
     vuMeter.setBounds (juce::Rectangle<int> (330, 100, 240, 124));
+    vuSourceButton.setBounds (juce::Rectangle<int> (594, 108, 32, 60));
 
     characterSwitch.setBounds (juce::Rectangle<int> (388, 250, 124, 124));
 

@@ -41,6 +41,9 @@ private:
     juce::ToggleButton tiltWetOnlyButton;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> tiltWetOnlyAttachment;
 
+    // VU meter source: IN (on) / OUT (off, default).
+    juce::ToggleButton vuSourceButton;
+
     CharacterSwitch characterSwitch;
     VUMeter vuMeter;
     LedChain ledChain;

@@ -4,12 +4,13 @@ namespace
 {
 const char* characterNames[6] = { "TUBE", "DIODE", "FUZZ", "TAPE", "CASSETTE", "DICTAPHONE" };
 
-constexpr float vuMinDb = -20.0f;
+constexpr float vuMinDb = -30.0f;   // dBFS scale
 constexpr float vuMaxDb = 3.0f;
 } // namespace
 
 //==============================================================================
-VUMeter::VUMeter (GrinderAudioProcessor& p) : processor (p)
+VUMeter::VUMeter (GrinderAudioProcessor& p, const juce::ToggleButton& source)
+    : processor (p), sourceSwitch (source)
 {
     startTimerHz (30);
 }
@@ -24,7 +25,8 @@ float VUMeter::vuAngleFor (float db)
 
 void VUMeter::timerCallback()
 {
-    const auto target = processor.getOutputLevelDb();
+    const auto target = sourceSwitch.getToggleState() ? processor.getInputLevelDb()
+                                                      : processor.getOutputLevelDb();
     const auto dt = 1.0f / 30.0f;
 
     // VU ballistics: fast-ish rise, slow fall (approximated one-pole).
@@ -69,7 +71,7 @@ void VUMeter::paint (juce::Graphics& g)
     // Scale ticks with dB labels.
     g.setColour (juce::Colour (0xff4a4238));
     g.setFont (juce::Font (juce::FontOptions{}.withHeight (10.0f)));
-    const float marks[] = { -20.0f, -10.0f, -7.0f, -5.0f, -3.0f, -1.0f, 0.0f, 1.0f, 3.0f };
+    const float marks[] = { -30.0f, -20.0f, -10.0f, -7.0f, -5.0f, -3.0f, -1.0f, 0.0f, 3.0f };
     for (auto db : marks)
     {
         const auto t = juce::jmap (db, vuMinDb, vuMaxDb, 0.0f, 1.0f);
@@ -86,12 +88,13 @@ void VUMeter::paint (juce::Graphics& g)
                     juce::Justification::centred);
     }
 
-    // Red zone arc (approximated with segments to avoid arc-direction pitfalls).
+    // Red zone arc above 0 dBFS (segmented to avoid arc-direction pitfalls).
+    const auto redStartT = juce::jmap (0.0f, vuMinDb, vuMaxDb, 0.0f, 1.0f);
     g.setColour (juce::Colour (0xffa83226).withAlpha (0.28f));
-    juce::Point<float> prev = centre + dirFor (0.8f) * arcRadius * 1.02f;
+    juce::Point<float> prev = centre + dirFor (redStartT) * arcRadius * 1.02f;
     for (int i = 1; i <= 8; ++i)
     {
-        const auto t = 0.8f + 0.2f * static_cast<float> (i) / 8.0f;
+        const auto t = redStartT + (1.0f - redStartT) * static_cast<float> (i) / 8.0f;
         const auto cur = centre + dirFor (t) * arcRadius * 1.02f;
         g.drawLine (juce::Line<float> (prev, cur), 3.0f);
         prev = cur;
@@ -111,7 +114,7 @@ void VUMeter::paint (juce::Graphics& g)
 
     g.setColour (juce::Colour (0xff4a4238));
     g.setFont (juce::Font (juce::FontOptions{}.withHeight (11.0f).withStyle ("Bold")));
-    g.drawText ("VU", bounds.withHeight (18.0f), juce::Justification::centred);
+    g.drawText ("dBFS", bounds.withHeight (18.0f), juce::Justification::centred);
 }
 
 //==============================================================================

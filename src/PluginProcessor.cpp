@@ -102,6 +102,25 @@ void GrinderAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     const int numChannels = std::min (buffer.getNumChannels(), 2);
     const int numSamples = buffer.getNumSamples();
 
+    // Input level tap (pre-DSP).
+    {
+        double inSum = 0.0;
+        int inCount = 0;
+        for (int c = 0; c < numChannels; ++c)
+        {
+            auto* data = buffer.getReadPointer (c);
+            for (int n = 0; n < numSamples; ++n)
+            {
+                inSum += static_cast<double> (data[n]) * static_cast<double> (data[n]);
+                ++inCount;
+            }
+        }
+        const double inRms = inCount > 0 ? std::sqrt (inSum / inCount) : 0.0;
+        inputLevelDb.store (
+            static_cast<float> (juce::Decibels::gainToDecibels (inRms, -60.0)),
+            std::memory_order_relaxed);
+    }
+
     for (int c = 0; c < numChannels; ++c)
     {
         auto* data = buffer.getWritePointer (c);
