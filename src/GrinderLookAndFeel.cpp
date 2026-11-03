@@ -39,7 +39,7 @@ void GrinderLookAndFeel::drawRotarySlider (juce::Graphics& g, int x, int y, int 
         const auto outer = centre + tickOuter * tickRadius;
         const auto active = static_cast<float> (i) / static_cast<float> (tickCount - 1)
                             <= sliderPos + 0.001f;
-        g.setColour (active ? accent.darker (0.1f)
+        g.setColour (active ? knobAccent.darker (0.1f)
                             : juce::Colour (0xff5a4a38).withAlpha (0.85f));
         juce::Line<float> tick (inner, outer);
         g.drawLine (tick, active ? 2.4f : 1.6f);
