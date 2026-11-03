@@ -15,7 +15,7 @@ void GrinderLookAndFeel::drawRotarySlider (juce::Graphics& g, int x, int y, int 
                                            float sliderPos, float rotaryStartAngle,
                                            float rotaryEndAngle, juce::Slider& slider)
 {
-    const auto accent = getAccentFromSlider (slider, accentColour);
+    const auto accent = getAccentFromSlider (slider, accent);
 
     const auto bounds = juce::Rectangle<float> (static_cast<float> (x),
                                                 static_cast<float> (y),
