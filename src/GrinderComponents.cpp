@@ -103,7 +103,7 @@ void VUMeter::paint (juce::Graphics& g)
 
     g.setColour (juce::Colour (0xff4a4238));
     g.setFont (juce::Font (juce::FontOptions{}.withHeight (11.0f).withStyle ("Bold")));
-    g.drawText ("VU", bounds.removeFromTop (18.0f), juce::Justification::centred);
+    g.drawText ("VU", bounds.withHeight (18.0f), juce::Justification::centred);
 }
 
 //==============================================================================
@@ -205,7 +205,7 @@ int CharacterSwitch::positionFromPoint (juce::Point<float> p) const
 void CharacterSwitch::setCharacterIndex (int index)
 {
     const auto norm = static_cast<float> (index) / static_cast<float> (numPositions - 1);
-    const auto* param = processor.getApvts().getParameter ("character");
+    auto* param = processor.getApvts().getParameter ("character");
     param->beginChangeGesture();
     param->setValueNotifyingHost (norm);
     param->endChangeGesture();
@@ -289,8 +289,8 @@ void CharacterSwitch::paint (juce::Graphics& g)
         const auto dir = juce::Point<float> (std::sin (a), -std::cos (a));
         const auto pointerLen = radius * 0.92f;
         juce::Path pointer;
-        pointer.addTriangle (centre, centre + dir.rotated (juce::degreesToRadians (6.0f)) * pointerLen,
-                             centre + dir.rotated (juce::degreesToRadians (-6.0f)) * pointerLen);
+        pointer.addTriangle (centre, centre + dir.rotatedAboutOrigin (juce::degreesToRadians (6.0f)) * pointerLen,
+                             centre + dir.rotatedAboutOrigin (juce::degreesToRadians (-6.0f)) * pointerLen);
         g.setColour (accent);
         g.fillPath (pointer);
     }
