@@ -54,10 +54,17 @@ void VUMeter::paint (juce::Graphics& g)
     g.drawRoundedRectangle (bounds, 6.0f, 2.5f);
 
     const auto centre = juce::Point<float> (bounds.getCentreX(), bounds.getBottom() - 14.0f);
-    const auto needleLen = bounds.getHeight() * 0.62f;
-    const auto arcRadius = needleLen * 0.92f;
-    const auto startAngle = juce::degreesToRadians (225.0f); // -135° from 12 o'clock
-    const auto endAngle = startAngle + juce::degreesToRadians (90.0f);
+    const auto needleLen = bounds.getHeight() * 0.58f;
+    const auto arcRadius = needleLen * 0.94f;
+
+    // Direction helper: t in 0..1 sweeps the needle from -45° (left) to
+    // +45° (right) around the upward axis.
+    auto dirFor = [] (float t)
+    {
+        const auto degrees = juce::jmap (t, -45.0f, 45.0f);
+        return juce::Point<float> (std::sin (juce::degreesToRadians (degrees)),
+                                   -std::cos (juce::degreesToRadians (degrees)));
+    };
 
     // Scale ticks with dB labels.
     g.setColour (juce::Colour (0xff4a4238));
@@ -66,8 +73,7 @@ void VUMeter::paint (juce::Graphics& g)
     for (auto db : marks)
     {
         const auto t = juce::jmap (db, vuMinDb, vuMaxDb, 0.0f, 1.0f);
-        const auto a = startAngle + t * (endAngle - startAngle);
-        const auto dir = juce::Point<float> (std::cos (a), -std::sin (a));
+        const auto dir = dirFor (t);
         const auto outer = centre + dir * arcRadius;
         const auto inner = centre + dir * (arcRadius - (db >= 0.0f ? 9.0f : 6.0f));
         g.setColour (db >= 0.0f ? juce::Colour (0xffa83226) : juce::Colour (0xff4a4238));
@@ -75,23 +81,25 @@ void VUMeter::paint (juce::Graphics& g)
 
         const auto textPos = centre + dir * (arcRadius - 18.0f);
         g.setColour (db >= 0.0f ? juce::Colour (0xffa83226) : juce::Colour (0xff4a4238));
-        g.drawText (juce::String (static_cast<int> (db)), 
+        g.drawText (juce::String (static_cast<int> (db)),
                     juce::Rectangle<float> (30.0f, 12.0f).withCentre (textPos),
                     juce::Justification::centred);
     }
 
-    // Red zone arc.
-    juce::Path redZone;
-    const auto redStart = startAngle + 0.8f * (endAngle - startAngle);
-    redZone.addCentredArc (centre.x, centre.y, arcRadius * 1.02f, arcRadius * 1.02f,
-                           0.0f, redStart, endAngle);
+    // Red zone arc (approximated with segments to avoid arc-direction pitfalls).
     g.setColour (juce::Colour (0xffa83226).withAlpha (0.28f));
-    g.strokePath (redZone, juce::PathStrokeType (3.0f));
+    juce::Point<float> prev = centre + dirFor (0.8f) * arcRadius * 1.02f;
+    for (int i = 1; i <= 8; ++i)
+    {
+        const auto t = 0.8f + 0.2f * static_cast<float> (i) / 8.0f;
+        const auto cur = centre + dirFor (t) * arcRadius * 1.02f;
+        g.drawLine (juce::Line<float> (prev, cur), 3.0f);
+        prev = cur;
+    }
 
     // Needle.
     {
-        const auto a = startAngle + needlePos * (endAngle - startAngle);
-        const auto dir = juce::Point<float> (std::cos (a), -std::sin (a));
+        const auto dir = dirFor (needlePos);
         g.setColour (juce::Colour (0xff2b2622));
         juce::Line<float> needle (centre, centre + dir * needleLen);
         g.drawLine (needle, 2.2f);

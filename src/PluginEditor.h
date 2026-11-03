@@ -20,7 +20,7 @@ private:
     void drawScrew (juce::Graphics&, juce::Point<float> centre, float radius) const;
     void drawReel (juce::Graphics&, juce::Point<float> centre, float radius) const;
     void drawKnobLabel (juce::Graphics&, const juce::Component& knob,
-                        const juce::String& text) const;
+                        const juce::String& text, bool above = false) const;
 
     GrinderAudioProcessor& processor;
 

@@ -175,10 +175,11 @@ void GrinderAudioProcessorEditor::drawReel (juce::Graphics& g, juce::Point<float
 }
 
 void GrinderAudioProcessorEditor::drawKnobLabel (juce::Graphics& g, const juce::Component& knob,
-                                                const juce::String& text) const
+                                                const juce::String& text, bool above) const
 {
-    auto bounds = knob.getBoundsInParent().toFloat();
-    const auto labelArea = bounds.removeFromBottom (26.0f).translated (0.0f, 4.0f);
+    const auto bounds = knob.getBoundsInParent().toFloat();
+    auto labelArea = juce::Rectangle<float> (bounds.getCentreX() - 70.0f, 0.0f, 140.0f, 20.0f);
+    labelArea.setY (above ? bounds.getY() - 22.0f : bounds.getBottom() + 4.0f);
     g.setFont (juce::Font (juce::FontOptions{}.withHeight (13.0f).withStyle ("Bold")));
     g.setColour (juce::Colour (0xff4a3a28));
     g.drawText (text.toUpperCase(), labelArea, juce::Justification::centred);
@@ -238,9 +239,9 @@ void GrinderAudioProcessorEditor::paint (juce::Graphics& g)
     drawScrew (g, juce::Point<float> (18.0f, bounds.getHeight() - 18.0f), 6.0f);
     drawScrew (g, juce::Point<float> (bounds.getWidth() - 18.0f, bounds.getHeight() - 18.0f), 6.0f);
 
-    // Knob labels.
+    // Knob labels (below the knobs; character switch above).
     drawKnobLabel (g, driveSlider, "DRIVE");
-    drawKnobLabel (g, characterSwitch, "CHARACTER");
+    drawKnobLabel (g, characterSwitch, "CHARACTER", true);
     drawKnobLabel (g, mixSlider, "MIX");
     drawKnobLabel (g, outputSlider, "OUTPUT");
     drawKnobLabel (g, tiltSlider, "TILT");
@@ -265,23 +266,23 @@ void GrinderAudioProcessorEditor::paint (juce::Graphics& g)
 void GrinderAudioProcessorEditor::resized()
 {
     // VU window top-centre (below head strip).
-    vuMeter.setBounds (juce::Rectangle<int> (330, 104, 240, 128));
+    vuMeter.setBounds (juce::Rectangle<int> (330, 100, 240, 124));
 
     characterSwitch.setBounds (juce::Rectangle<int> (388, 250, 124, 124));
 
     // Big knobs row.
-    driveSlider.setBounds (juce::Rectangle<int> (56, 246, 104, 104));
-    mixSlider.setBounds (juce::Rectangle<int> (212, 258, 80, 80));
-    outputSlider.setBounds (juce::Rectangle<int> (560, 258, 80, 80));
+    driveSlider.setBounds (juce::Rectangle<int> (56, 242, 100, 100));
+    mixSlider.setBounds (juce::Rectangle<int> (212, 254, 80, 80));
+    outputSlider.setBounds (juce::Rectangle<int> (556, 254, 80, 80));
 
     // Toggle switch.
-    tiltWetOnlyButton.setBounds (juce::Rectangle<int> (760, 120, 36, 52));
+    tiltWetOnlyButton.setBounds (juce::Rectangle<int> (760, 112, 36, 56));
 
     // Mini knobs row.
-    const auto miniY = 384;
+    const auto miniY = 390;
     const auto miniSize = 56;
-    const auto miniGap = 128;
-    const auto miniStartX = 60;
+    const auto miniStep = 145;
+    const auto miniStartX = 56;
     const std::initializer_list<juce::Slider*> minis = {
         &tiltSlider, &midCharacterSlider, &lowCutSlider, &presenceSlider,
         &wowFlutterSlider, &noiseSlider
@@ -289,7 +290,7 @@ void GrinderAudioProcessorEditor::resized()
     int i = 0;
     for (auto* knob : minis)
     {
-        knob->setBounds (miniStartX + i * miniGap, miniY, miniSize, miniSize);
+        knob->setBounds (miniStartX + i * miniStep, miniY, miniSize, miniSize);
         ++i;
     }
 
