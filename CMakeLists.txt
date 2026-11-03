@@ -32,6 +32,8 @@ clap_juce_extensions_plugin(
 target_sources(Grinder PRIVATE
     src/PluginProcessor.cpp
     src/PluginEditor.cpp
+    src/GrinderLookAndFeel.cpp
+    src/GrinderComponents.cpp
 )
 
 target_include_directories(Grinder PRIVATE

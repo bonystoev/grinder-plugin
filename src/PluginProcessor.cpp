@@ -107,6 +107,21 @@ void GrinderAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
         auto* data = buffer.getWritePointer (c);
         channels[static_cast<size_t> (c)].processBlock (data, data, numSamples);
     }
+
+    double levelSum = 0.0;
+    int levelCount = 0;
+    for (int c = 0; c < numChannels; ++c)
+    {
+        auto* data = buffer.getReadPointer (c);
+        for (int n = 0; n < numSamples; ++n)
+        {
+            levelSum += static_cast<double> (data[n]) * static_cast<double> (data[n]);
+            ++levelCount;
+        }
+    }
+    const double rms = levelCount > 0 ? std::sqrt (levelSum / levelCount) : 0.0;
+    outputLevelDb.store (static_cast<float> (juce::Decibels::gainToDecibels (rms, -60.0)),
+                         std::memory_order_relaxed);
 }
 
 void GrinderAudioProcessor::syncParams()
