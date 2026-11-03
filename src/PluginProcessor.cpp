@@ -29,8 +29,6 @@ GrinderAudioProcessor::createParameterLayout()
     layout.add (std::make_unique<juce::AudioParameterFloat> (
         juce::ParameterID { "drive", 1 }, "Drive", 0.0f, 100.0f, 35.0f));
 
-    juce::AudioParameterChoice::Attributes charAttrs;
-    charAttrs.withAutomatable (true);
     layout.add (std::make_unique<juce::AudioParameterChoice> (
         juce::ParameterID { "character", 1 }, "Character",
         juce::StringArray { "Tube", "Diode", "Fuzz", "Tape", "Cassette", "Dictaphone" }, 0));
@@ -104,11 +102,45 @@ void GrinderAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     const int numChannels = std::min (buffer.getNumChannels(), 2);
     const int numSamples = buffer.getNumSamples();
 
+    // Input level tap (pre-DSP).
+    {
+        double inSum = 0.0;
+        int inCount = 0;
+        for (int c = 0; c < numChannels; ++c)
+        {
+            auto* data = buffer.getReadPointer (c);
+            for (int n = 0; n < numSamples; ++n)
+            {
+                inSum += static_cast<double> (data[n]) * static_cast<double> (data[n]);
+                ++inCount;
+            }
+        }
+        const double inRms = inCount > 0 ? std::sqrt (inSum / inCount) : 0.0;
+        inputLevelDb.store (
+            static_cast<float> (juce::Decibels::gainToDecibels (inRms, -60.0)),
+            std::memory_order_relaxed);
+    }
+
     for (int c = 0; c < numChannels; ++c)
     {
         auto* data = buffer.getWritePointer (c);
         channels[static_cast<size_t> (c)].processBlock (data, data, numSamples);
     }
+
+    double levelSum = 0.0;
+    int levelCount = 0;
+    for (int c = 0; c < numChannels; ++c)
+    {
+        auto* data = buffer.getReadPointer (c);
+        for (int n = 0; n < numSamples; ++n)
+        {
+            levelSum += static_cast<double> (data[n]) * static_cast<double> (data[n]);
+            ++levelCount;
+        }
+    }
+    const double rms = levelCount > 0 ? std::sqrt (levelSum / levelCount) : 0.0;
+    outputLevelDb.store (static_cast<float> (juce::Decibels::gainToDecibels (rms, -60.0)),
+                         std::memory_order_relaxed);
 }
 
 void GrinderAudioProcessor::syncParams()

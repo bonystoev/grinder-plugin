@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -34,6 +35,12 @@ public:
 
     juce::AudioProcessorValueTreeState& getApvts() { return parameters; }
 
+    // Post-processing RMS level in dBFS (for the VU meter / LED chain).
+    float getOutputLevelDb() const noexcept { return outputLevelDb.load (std::memory_order_relaxed); }
+
+    // Pre-processing RMS level in dBFS (for the VU meter input mode).
+    float getInputLevelDb() const noexcept { return inputLevelDb.load (std::memory_order_relaxed); }
+
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
 private:
@@ -42,6 +49,8 @@ private:
     juce::AudioProcessorValueTreeState parameters;
     grinder::Params dspParams;
     std::array<grinder::GrinderChannel, 2> channels;
+    std::atomic<float> outputLevelDb { -60.0f };
+    std::atomic<float> inputLevelDb { -60.0f };
     double currentSampleRate = 48000.0;
 
     std::atomic<float>* driveParam = nullptr;
